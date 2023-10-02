@@ -3,11 +3,13 @@ import getSession from './getSession'
 import prismaDB from '@/lib/db'
 import { redirect } from 'next/navigation'
 
+export type TGetCurrentUser= Awaited<ReturnType<typeof getCurrentUser>>
+
 async function getCurrentUser() {
     const currentUser = await getSession()
     
     if(!currentUser?.user?.email) {
-        return redirect('/')
+        return redirect('/login?error=You are unauthorized')
     }
 
    const user = await prismaDB.user.findUnique({
