@@ -11,6 +11,7 @@ import {Button} from '@/components/ui/button'
 import FileUpload from '../FileUpload'
 import { mutate } from '@/hooks/useQueryProcessor'
 import { useRouter } from 'next/navigation'
+import { Server } from '@prisma/client'
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -20,6 +21,7 @@ export const formSchema = z.object({
     message: 'Server image is Required'
   })
 })
+
 export type formType = z.infer<typeof formSchema>;
 
 const InitialModal = () => {
@@ -30,8 +32,6 @@ const InitialModal = () => {
   useEffect(() => {
     setIsMounted(true)
   }, [])
-
- 
 
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
@@ -44,12 +44,17 @@ const InitialModal = () => {
 
   const {isSubmitting: isLoading} = form.formState
 
-  const createServer = mutate<formType, unknown>('/servers', 'POST', ['servers'])
+  const createServer = mutate<formType, Server>('/servers', 'POST', ['servers'])
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
       console.log(values)
-      createServer.mutate(values)
+      createServer.mutate(values, {
+        onSuccess:(data) => {
+          console.log(data)
+        }
+      })
       form.reset()
+      router.refresh()
       window.location.reload()
     } catch (error) {
       console.error(error)

@@ -5,6 +5,7 @@ import { Open_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import "@uploadthing/react/styles.css";
+
 const font = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

@@ -18,8 +18,9 @@ model Server {
 
   // this is Profile in tutorial but we change it to user model
   userId  String
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   members Member[]
+  channels Channel[]
 }
 
 enum MemberRole {
@@ -49,14 +50,15 @@ enum ChannelType {
 }
 
 model Channel {
-  id   String      @id @default(uuid())
-  name String
-  type ChannelType @default(Text)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String      @id @default(uuid())
+  name      String
+  type      ChannelType @default(Text)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  serverId  String
+  server    Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // necessary for next auth
@@ -86,7 +88,7 @@ model User {
   profile  Profile?
   servers  Server[]
   members  Member[]
-  channels  Channel[]
+  channels Channel[]
 }
 
 model Account {
