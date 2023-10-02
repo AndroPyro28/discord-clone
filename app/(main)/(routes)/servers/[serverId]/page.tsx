@@ -1,4 +1,5 @@
-import React from 'react'
+import { signOut } from 'next-auth/react'
+import React, { useEffect } from 'react'
 
 const ServerId = () => {
   return (

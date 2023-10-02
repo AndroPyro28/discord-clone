@@ -51,11 +51,12 @@ const InitialModal = () => {
       createServer.mutate(values, {
         onSuccess:(data) => {
           console.log(data)
+          form.reset()
+          router.refresh()
+          window.location.reload()
         }
       })
-      form.reset()
-      router.refresh()
-      window.location.reload()
+      
     } catch (error) {
       console.error(error)
     }
