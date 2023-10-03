@@ -17,7 +17,7 @@ function Providers({ children }: React.PropsWithChildren) {
 
   return (
     <QueryClientProvider client={client}>
-      <ReactQueryDevtools />
+      {/* <ReactQueryDevtools /> */}
       <Toaster />
       <SessionProvider>{children}</SessionProvider>
     </QueryClientProvider>

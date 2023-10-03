@@ -1,8 +1,9 @@
-import Providers from "@/utils/Provider";
 import "./globals.css";
-import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
+import Providers from "@/utils/Provider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import ModalProvider from "@/components/providers/ModalProvider";
+import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import "@uploadthing/react/styles.css";
 
@@ -22,7 +23,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn(font.className,'bg-white dark:bg-[#313338]')}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="discord-theme">
-          <Providers>{children}</Providers>
+          <Providers>
+            <ModalProvider />
+            {children}
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

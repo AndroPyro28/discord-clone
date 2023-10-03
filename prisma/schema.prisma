@@ -44,7 +44,7 @@ model Member {
 }
 
 enum ChannelType {
-  Text
+  TEXT
   AUDIO
   VIDEO
 }
@@ -52,7 +52,7 @@ enum ChannelType {
 model Channel {
   id        String      @id @default(uuid())
   name      String
-  type      ChannelType @default(Text)
+  type      ChannelType @default(TEXT)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   serverId  String

@@ -1,6 +1,4 @@
 "use client"
-import { useEffect, useState } from 'react'
-
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -12,7 +10,7 @@ import FileUpload from '../FileUpload'
 import { mutate } from '@/hooks/useQueryProcessor'
 import { useRouter } from 'next/navigation'
 import { Server } from '@prisma/client'
-import { signOut } from 'next-auth/react'
+import { useModal } from '@/hooks/use-modal-store'
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -25,15 +23,12 @@ export const formSchema = z.object({
 
 export type formType = z.infer<typeof formSchema>;
 
-const InitialModal = () => {
+const CreateServerModal = () => {
+    const {isOpen, type, onClose} = useModal()
 
-  const [isMounted, setIsMounted] = useState(false);
+    const isModalOpen = isOpen && type === 'createServer'
+
   const router = useRouter()
-
-  useEffect(() => {
-    setIsMounted(true)
-    // void signOut()
-  }, [])
 
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
@@ -42,20 +37,18 @@ const InitialModal = () => {
       imageUrl: '',
     }
   })
-
-
+  
   const {isSubmitting: isLoading} = form.formState
 
   const createServer = mutate<formType, Server>('/servers', 'POST', ['servers'])
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
-      console.log(values)
+
       createServer.mutate(values, {
         onSuccess:(data) => {
           console.log(data)
           form.reset()
           router.refresh()
-          window.location.reload()
         }
       })
       
@@ -64,10 +57,13 @@ const InitialModal = () => {
     }
   }
 
-  if(!isMounted) return null
-
+  const handleClose = () => {
+    form.reset()
+    onClose()
+  }
+  
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
 
       <DialogContent className='bg-white text-black p-0 overflow-hidden'>
         <DialogHeader className='pt-8 px-6'>
@@ -130,4 +126,4 @@ const InitialModal = () => {
   )
 }
 
-export default InitialModal
+export default CreateServerModal
