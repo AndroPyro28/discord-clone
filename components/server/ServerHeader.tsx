@@ -1,3 +1,4 @@
+"use client"
 import { ServerWithMembersWithUsers } from "@/types";
 import { ChannelType, MemberRole } from "@prisma/client";
 import React from "react";
@@ -9,14 +10,21 @@ import {
   DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
 import { ChevronDown, LogOut, PlusCircle, Settings, Trash, UserPlus, Users } from "lucide-react";
+import { useModal } from "@/hooks/use-modal-store";
+import {type ModalType} from '@/hooks/use-modal-store'
 
 type ServerHeaderProps = {
   server: ServerWithMembersWithUsers;
   role?: MemberRole;
 };
 const ServerHeader: React.FC<ServerHeaderProps> = ({ role, server }) => {
+  const {onOpen,  } = useModal()
   const isAdmin = role === MemberRole.ADMIN;
   const isModerator = isAdmin || role === MemberRole.MODERATOR;
+
+  const handleOpen = (modalType: ModalType) => {
+    onOpen(modalType, {server})
+  }
 
   return (
     <DropdownMenu>
@@ -29,14 +37,14 @@ const ServerHeader: React.FC<ServerHeaderProps> = ({ role, server }) => {
       <DropdownMenuContent className="w-56 text-xs font-medium text-black dark:text-neutral-400 space-y-[2px]">
 
         {isModerator && (
-          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer">
+          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer"  onClick={() => handleOpen('invite')}>
             Invite People
             <UserPlus className="h-4 w-4 ml-auto"/>
           </DropdownMenuItem>
         )}
 
         {isAdmin && (
-          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer">
+          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer" onClick={() => handleOpen('editServer')}>
             Server Settings
             <Settings className="h-4 w-4 ml-auto"/>
           </DropdownMenuItem>

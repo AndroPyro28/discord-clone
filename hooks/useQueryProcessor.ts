@@ -121,7 +121,7 @@ export const mutate = <T, K>(
       if (axios.isAxiosError(err)) {
         // err.response?.data.message if nestjs backend
         // err.response?.data if nextjs backend
-        console.log(err.response?.data);
+        console.error(err.response?.data);
         toast.error(err.response?.data)
       } else {
         console.error(err);

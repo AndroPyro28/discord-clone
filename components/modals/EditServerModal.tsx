@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { Server } from "@prisma/client";
 import { useModal } from "@/hooks/use-modal-store";
 import LoadingSpinner from "../loaders/LoadingSpinner";
+import { useEffect } from "react";
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -38,13 +39,12 @@ export const formSchema = z.object({
 
 export type formType = z.infer<typeof formSchema>;
 
-const CreateServerModal = () => {
-  const { isOpen, type, onClose } = useModal();
+const EditServerModal = () => {
 
-  const isModalOpen = isOpen && type === "createServer";
-
+  const { isOpen, type, onClose, data } = useModal();
+  const {server} = data;
+  const isModalOpen = isOpen && type === 'editServer';
   const router = useRouter();
-
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,15 +53,23 @@ const CreateServerModal = () => {
     },
   });
 
+  useEffect(() => {
+    if(server) {
+      form.setValue('name', server.name)
+      form.setValue('imageUrl', server.imageUrl)
+    }
+  },[server, form, data, type])
+
   const { isSubmitting: isLoading } = form.formState;
 
-  const createServer = mutate<formType, Server>("/servers", "POST", [
+  const createServer = mutate<formType, Server>(`/servers/${server?.id}`, "PATCH", [
     "servers",
   ]);
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
       createServer.mutate(values, {
         onSuccess: (data) => {
+          console.log(data);
           form.reset();
           router.refresh();
         },
@@ -143,7 +151,7 @@ const CreateServerModal = () => {
                   if (isLoading || createServer.isLoading)
                     return <LoadingSpinner size={20} />;
 
-                  return "Create";
+                  return "Save";
                 })()}
               </Button>
             </DialogFooter>
@@ -154,4 +162,4 @@ const CreateServerModal = () => {
   );
 };
 
-export default CreateServerModal;
+export default EditServerModal;

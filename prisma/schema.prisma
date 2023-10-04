@@ -14,7 +14,7 @@ model Server {
   id         String @id @default(uuid())
   name       String
   imageUrl   String @db.Text
-  inviteCode String @db.Text
+  inviteCode String @unique
 
   // this is Profile in tutorial but we change it to user model
   userId  String

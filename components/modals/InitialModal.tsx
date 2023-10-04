@@ -13,6 +13,7 @@ import { mutate } from '@/hooks/useQueryProcessor'
 import { useRouter } from 'next/navigation'
 import { Server } from '@prisma/client'
 import { signOut } from 'next-auth/react'
+import LoadingSpinner from '../loaders/LoadingSpinner'
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -32,7 +33,6 @@ const InitialModal = () => {
 
   useEffect(() => {
     setIsMounted(true)
-    // void signOut()
   }, [])
 
   const form = useForm<formType>({
@@ -101,14 +101,13 @@ const InitialModal = () => {
                   name="name"
                   render={({field}) => (
                     <FormItem>
-
                       <FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70'>
                         Server name
                       </FormLabel>
 
                       <FormControl>
                         <Input  
-                          disabled={isLoading}
+                          disabled={isLoading || createServer.isLoading}
                           className='bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0 '
                           placeholder='Enter server name'
                           {...field}
@@ -120,7 +119,17 @@ const InitialModal = () => {
                 />
               </div>
                   <DialogFooter className='bg-gray-100 px-6 py-4 '>
-                    <Button disabled={isLoading} variant={'primary'}>Create</Button>
+                    <Button 
+                    disabled={isLoading || createServer.isLoading}
+                    variant={'primary'}>
+                      {(()=> {
+                        if (isLoading || createServer.isLoading)
+                        return <LoadingSpinner size={20} />;
+
+
+                        return 'Create'
+                      })()}
+                    </Button>
                   </DialogFooter>
             </form>
         </Form>
