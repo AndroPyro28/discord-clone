@@ -63,6 +63,7 @@ function AuthForm() {
       email: "",
       password: "",
     },
+    mode: 'all',
     resolver: zodResolver(schema),
   });
 

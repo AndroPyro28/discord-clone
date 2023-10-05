@@ -40,7 +40,8 @@ const InitialModal = () => {
     defaultValues: {
       name: '',
       imageUrl: '',
-    }
+    },
+    mode: 'all'
   })
 
 

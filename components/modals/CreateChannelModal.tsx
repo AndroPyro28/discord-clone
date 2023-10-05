@@ -2,14 +2,11 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   Form,
   FormControl,
@@ -18,69 +15,63 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import FileUpload from "../FileUpload";
 import { mutate } from "@/hooks/useQueryProcessor";
-import { useRouter } from "next/navigation";
-import { Server } from "@prisma/client";
+import { useParams, useRouter } from "next/navigation";
+import { Channel, ChannelType, Server } from "@prisma/client";
 import { useModal } from "@/hooks/use-modal-store";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingSpinner from "../loaders/LoadingSpinner";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 export const formSchema = z.object({
   name: z.string().min(1, {
     message: "Server name is required",
+  }).refine(name => name !== 'general', {
+    message: "Channel name cannot be 'general'"
   }),
-  imageUrl: z.string().min(1, {
-    message: "Server image is Required",
-  }),
+  type: z.nativeEnum(ChannelType)
 });
 
 export type formType = z.infer<typeof formSchema>;
 
-const EditServerModal = () => {
-
-  const { isOpen, type, onClose, data } = useModal();
-  const {server} = data;
-  const isModalOpen = isOpen && type === 'editServer';
+const CreateChannelModal = () => {
+  const { isOpen, type, onClose } = useModal();
+  const isModalOpen = isOpen && type === "createChannel";
   const router = useRouter();
+  const {serverId} = useParams()
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      imageUrl: "",
+      type: "TEXT"
     },
-    mode: 'all'
+     mode: 'all'
   });
+  const { isSubmitting: isLoading} = form.formState;
 
-  useEffect(() => {
-    if(server) {
-      form.setValue('name', server.name)
-      form.setValue('imageUrl', server.imageUrl)
-    }
-
-    return () => {
-      if(server) {
-        form.setValue('name', server.name)
-        form.setValue('imageUrl', server.imageUrl)
-      }
-    }
-  },[server, form, type, router])
-
-  const { isSubmitting: isLoading } = form.formState;
-
-  const createServer = mutate<formType, Server>(`/servers/${server?.id}`, "PATCH", [
-    "servers",
+  const createServer = mutate<formType, Channel>(`/channels?serverId=${serverId}`, "POST", [
+    "channels ",
   ]);
+
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
       createServer.mutate(values, {
         onSuccess: (data) => {
-          console.log(data);
-          // form.reset();
-          toast.success('Image uploaded')
+          toast.success('Channel created')
+          form.reset();
           router.refresh();
         },
       });
@@ -99,51 +90,57 @@ const EditServerModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Customize your server
+            Create channel
           </DialogTitle>
-
-          <DialogDescription className="text-center text-zinc">
-            Give your server a personality with a name and image an image. You
-            can always change it later.
-          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-8 px-6">
-              <div className="flex items-center justify-center text-center">
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FileUpload
-                          endpoint="serverImage"
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              
 
-              <FormField
+              <FormField 
+                control={form.control}
+                name="type"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
+                      Channel Type
+                    </FormLabel>
+                    <Select disabled={isLoading} onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-zinc-300/50 border-0 focus:ring-0 text-black ring-offset-0 focus:ring-offset-0 capitalize outline-none">
+                          <SelectValue placeholder="Select a channel type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(ChannelType).map((type) => (
+                          <SelectItem key={type} value={type} className="capitalize">
+                            {type.toLocaleLowerCase()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
-                      Server name
+                      Channel name
                     </FormLabel>
 
                     <FormControl>
                       <Input
+                      // {...register('name')}
                         disabled={isLoading || createServer.isLoading}
-                        className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0 "
-                        placeholder="Enter server name"
+                        className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
+                        placeholder="Enter channel name"
                         {...field}
                       />
                     </FormControl>
@@ -151,6 +148,7 @@ const EditServerModal = () => {
                   </FormItem>
                 )}
               />
+              
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4 ">
               <Button
@@ -161,7 +159,7 @@ const EditServerModal = () => {
                   if (isLoading || createServer.isLoading)
                     return <LoadingSpinner size={20} />;
 
-                  return "Save";
+                  return "Create";
                 })()}
               </Button>
             </DialogFooter>
@@ -172,4 +170,4 @@ const EditServerModal = () => {
   );
 };
 
-export default EditServerModal;
+export default CreateChannelModal;

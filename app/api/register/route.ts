@@ -22,7 +22,7 @@ export const POST = async (req: Request, res: Response) => {
   try {
     const { email, name, password } = await req.json();
 
-    if (!schema.safeParse({email, name, password})) {
+    if (!schema.safeParse({email, name, password}).success) {
       return new NextResponse("missing info", { status: 400 });
     }
 

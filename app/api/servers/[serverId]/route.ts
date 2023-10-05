@@ -19,7 +19,7 @@ export async function PATCH (request: Request, {params}: {params: {serverId: str
         const currentUser = await getCurrentUser();
         const {name, imageUrl} = await request.json() as formType
 
-        if(!formSchema.safeParse({name, imageUrl})) {
+        if(!formSchema.safeParse({name, imageUrl}).success) {
             return new NextResponse("missing info", { status: 400 });
         }
 

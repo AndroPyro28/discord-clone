@@ -20,7 +20,7 @@ export async function POST(req:Request) {
     try {
         const {name, imageUrl} = await req.json() as formType
         const currentUser = await getCurrentUser()
-        if(!formSchema.safeParse({name, imageUrl})) {
+        if(!formSchema.safeParse({name, imageUrl}).success) {
             return new NextResponse("missing info", { status: 400 });
         }
 
