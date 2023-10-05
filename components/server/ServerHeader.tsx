@@ -51,7 +51,7 @@ const ServerHeader: React.FC<ServerHeaderProps> = ({ role, server }) => {
         )}
 
         {isAdmin && (
-          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer">
+          <DropdownMenuItem className="text-indigo-600 dark:text-indigo-300 px-3 py-2 text-sm cursor-pointer" onClick={() => handleOpen('members')}>
             Manage Members
             <Users className="h-4 w-4 ml-auto"/>
           </DropdownMenuItem>

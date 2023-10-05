@@ -56,7 +56,6 @@ const InviteModal = () => {
       });
     } catch (error) {
     } finally {
-      // setIsLoading(false)
     }
   };
 

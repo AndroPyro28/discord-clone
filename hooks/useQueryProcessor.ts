@@ -11,10 +11,12 @@ const apiClient = axios.create({
 
 export const query = <T>(
   url: string,
+  // queryString: {[key: string]: any},
   key: any[] = [],
   options = {},
   headers = {}
 ) => {
+  
   return useQuery<T>({
     queryKey: key,
     queryFn: async () => {
@@ -95,7 +97,6 @@ export const mutate = <T, K>(
   options = {},
   headers = {}
 ) => {
-
   const queryClient = useQueryClient();
 
   return useMutation({
