@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import ActionTooltip from "../ActionTooltip";
-
+import serverImgPlaceholder from '@/public/discord-server-placeholder.png'
 type NavigationProps = {
   id: string;
   imageUrl: string;
@@ -36,7 +36,7 @@ const NavigationItem: React.FC<NavigationProps> = ({ id, imageUrl, name }) => {
               "bg-primary/10 text-primary rounded-[16px] "
           )}
         >
-          <Image fill src={imageUrl} alt="channel" className="object-cover" />
+          <Image fill src={imageUrl || serverImgPlaceholder} alt="channel" className="object-cover" />
         </div>
       </button>
     </ActionTooltip>

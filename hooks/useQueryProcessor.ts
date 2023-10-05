@@ -123,7 +123,7 @@ export const mutate = <T, K>(
         // err.response?.data.message if nestjs backend
         // err.response?.data if nextjs backend
         console.error(err.response?.data);
-        toast.error(err.response?.data)
+        // toast.error(err.response?.data)
       } else {
         console.error(err);
       }

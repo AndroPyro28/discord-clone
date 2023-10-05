@@ -1,6 +1,7 @@
 import getCurrentUser, {TGetCurrentUser} from "@/actions/getCurrentUser";
 import getSession from "@/actions/getSession";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { utapi } from "uploadthing/server";
  
 const f = createUploadthing();
  
@@ -25,6 +26,12 @@ export const ourFileRouter = {
       console.log("file url", file.url);
     }),
     messageFile: f(['image', 'pdf'])
+    .middleware( async ({req}) => await auth(req))
+    .onUploadComplete(async ({ metadata, file }) => {
+        console.log("Upload complete for userId:", metadata.id);
+        console.log("file url", file.url);
+    }),
+    deleteImage: f(['image', 'pdf'])
     .middleware( async ({req}) => await auth(req))
     .onUploadComplete(async ({ metadata, file }) => {
         console.log("Upload complete for userId:", metadata.id);

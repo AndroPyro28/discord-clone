@@ -27,6 +27,7 @@ import { Server } from "@prisma/client";
 import { useModal } from "@/hooks/use-modal-store";
 import LoadingSpinner from "../loaders/LoadingSpinner";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -58,7 +59,14 @@ const EditServerModal = () => {
       form.setValue('name', server.name)
       form.setValue('imageUrl', server.imageUrl)
     }
-  },[server, form, data, type])
+
+    return () => {
+      if(server) {
+        form.setValue('name', server.name)
+        form.setValue('imageUrl', server.imageUrl)
+      }
+    }
+  },[server, form, type, router])
 
   const { isSubmitting: isLoading } = form.formState;
 
@@ -70,7 +78,8 @@ const EditServerModal = () => {
       createServer.mutate(values, {
         onSuccess: (data) => {
           console.log(data);
-          form.reset();
+          // form.reset();
+          toast.success('Image uploaded')
           router.refresh();
         },
       });

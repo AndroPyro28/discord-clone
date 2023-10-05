@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { Server } from "@prisma/client";
 import { useModal } from "@/hooks/use-modal-store";
 import LoadingSpinner from "../loaders/LoadingSpinner";
+import toast from "react-hot-toast";
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -62,6 +63,7 @@ const CreateServerModal = () => {
     try {
       createServer.mutate(values, {
         onSuccess: (data) => {
+          toast.success('Image uploaded')
           form.reset();
           router.refresh();
         },
