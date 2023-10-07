@@ -41,3 +41,24 @@ export async function PATCH (request: Request, {params}: {params: {serverId: str
         return new NextResponse('Internal error', {status:500})
     }
 }
+
+export async function DELETE (request: Request, {params}: {params: {serverId: string}}) {
+    try {
+        const currentUser = await getCurrentUser();
+        const {serverId} = params;
+
+        const server = await prismaDB.server.delete({
+            where:{
+                id: serverId,
+                userId: currentUser?.id
+            },
+        });
+
+        return NextResponse.json(server);
+        
+    } catch (error) {
+        console.error(`[DELETE:SERVER_ID]`,error)
+
+        return new NextResponse('Internal error', {status:500})
+    }
+}

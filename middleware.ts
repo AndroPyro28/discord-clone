@@ -29,10 +29,14 @@ export default withAuth(async function middleware(req) {
 
 export const config  = {
     matcher: [
+        // front end
         '/',
         '/servers/:path*',
         '/invite/:path*',
+
+        // back end
         '/api/servers/:path*',
         '/api/uploadthing/:path*',
+        '/api/upload-thing-delete/:path*',
     ],
 }
