@@ -35,6 +35,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingSpinner from "../loaders/LoadingSpinner";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 export const formSchema = z.object({
   name: z.string().min(1, {
@@ -48,18 +49,28 @@ export const formSchema = z.object({
 export type formType = z.infer<typeof formSchema>;
 
 const CreateChannelModal = () => {
-  const { isOpen, type, onClose } = useModal();
+  const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "createChannel";
   const router = useRouter();
   const {serverId} = useParams()
+
+ 
+  const {channelType} = data;
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: ChannelType.TEXT
+      type:  channelType || ChannelType.TEXT
     },
      mode: 'all'
   });
+
+  useEffect(() => {
+    if(channelType) {
+      form.setValue('type', channelType)
+    }
+  }, [channelType])
+
   const { isSubmitting: isLoading} = form.formState;
 
   const createServer = mutate<formType, Channel>(`/channels?serverId=${serverId}`, "POST", [
