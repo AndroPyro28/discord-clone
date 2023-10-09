@@ -5,6 +5,7 @@ import { Edit, Hash, Lock, Mic, Trash, Video } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import ActionTooltip from "../ActionTooltip";
+import { ModalType, useModal } from "@/hooks/use-modal-store";
 
 type ServerChannelProps = {
   channel: Channel;
@@ -12,55 +13,75 @@ type ServerChannelProps = {
   role?: MemberRole;
 };
 
-
 const channelIconMap = {
-    [ChannelType.TEXT]: Hash,
-    [ChannelType.AUDIO]: Mic,
-    [ChannelType.VIDEO]: Video,
-  };
+  [ChannelType.TEXT]: Hash,
+  [ChannelType.AUDIO]: Mic,
+  [ChannelType.VIDEO]: Video,
+};
 
-const ServerChannel: React.FC<ServerChannelProps> = ({ channel, role }) => {
+const ServerChannel: React.FC<ServerChannelProps> = ({
+  channel,
+  role,
+  server,
+}) => {
+  const { onOpen } = useModal();
 
   const params = useParams();
   const router = useRouter();
 
   const Icon = channelIconMap[channel.type];
+  const onClick = () => {
+    router.push(`/servers/${params?.serverId}/channels/${channel.id}`);
+  };
+  const onAction = (e: React.MouseEvent, action: ModalType) => {
+    e.stopPropagation()
+    onOpen(action, {channel, server})
+  };
 
   return (
     <ActionTooltip label={channel.name}>
-    <button
-      onClick={() => {}}
-      className={cn(
-        `group px-2 py-2 rounded-md flex items-center gap-x-2 w-full  hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1`,
-        params.channelId == channel.id && 'bg-zinc-700/20 dark:bg-zinc-700'
+      <button
+        onClick={onClick}
+        className={cn(
+          `group px-2 py-2 rounded-md flex items-center gap-x-2 w-full  hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1`,
+          params.channelId == channel.id && "bg-zinc-700/20 dark:bg-zinc-700"
         )}
+      >
+        <Icon className="flex-shrink-0 w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+        <p
+          className={cn(
+            `line-clamp-1 font-semibold text-sm text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition`,
+            params?.channelId === channel.id &&
+              "text-primary dark:text-zinc-200 dark:group-hover:text-white"
+          )}
         >
-       <Icon className="flex-shrink-0 w-5 h-5 text-zinc-500 dark:text-zinc-400" />
-       <p className={cn(`line-clamp-1 font-semibold text-sm text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition`,
-       params?.channelId === channel.id && 'text-primary dark:text-zinc-200 dark:group-hover:text-white')}>
-        {channel.name}
-       </p>
-       
-       {
-        channel.name !== 'general' && role != MemberRole.GUEST && (
+          {channel.name}
+        </p>
+
+        {channel.name !== "general" && role != MemberRole.GUEST && (
           <div className="ml-auto flex items-center gap-x-2">
             <ActionTooltip label="Edit">
-              <Edit className="w-4 h-4 hidden group-hover:block text-zinc-500 hover:text-zinc-600 dark:text-zinc-400
-              dark:hover:text-zinc-300 transition"/>
+              <Edit
+                onClick={(e) => onAction(e, 'editChannel')}
+                className="w-4 h-4 hidden group-hover:block text-zinc-500 hover:text-zinc-600 dark:text-zinc-400
+              dark:hover:text-zinc-300 transition"
+              />
             </ActionTooltip>
             <ActionTooltip label="Delete">
-              <Trash className="w-4 h-4 hidden group-hover:block text-zinc-500 hover:text-zinc-600 dark:text-zinc-400
-              dark:hover:text-zinc-300 transition"/>
+              <Trash
+                onClick={(e) => onAction(e, 'deleteChannel')}
+                className="w-4 h-4 hidden group-hover:block text-zinc-500 hover:text-zinc-600 dark:text-zinc-400
+              dark:hover:text-zinc-300 transition"
+              />
             </ActionTooltip>
           </div>
-        )
-      }
+        )}
 
-       {channel.name === 'general' && (
-         <Lock className="ml-auto w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-         )}
-    </button>
-         </ActionTooltip>
+        {channel.name === "general" && (
+          <Lock className="ml-auto w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+        )}
+      </button>
+    </ActionTooltip>
   );
 };
 

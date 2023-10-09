@@ -64,7 +64,7 @@ const CreateServerModal = () => {
     try {
       createServer.mutate(values, {
         onSuccess: (data) => {
-          toast.success('Image uploaded')
+          toast.success('Server created.')
           form.reset();
           router.refresh();
         },

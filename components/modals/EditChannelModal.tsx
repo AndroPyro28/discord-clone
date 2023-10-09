@@ -51,44 +51,50 @@ export const formSchema = z.object({
 
 export type formType = z.infer<typeof formSchema>;
 
-const CreateChannelModal = () => {
+const EditChannelModal = () => {
   const { isOpen, type, onClose, data } = useModal();
-  const isModalOpen = isOpen && type === "createChannel";
+  const isModalOpen = isOpen && type === "editChannel";
   const router = useRouter();
-  const { serverId } = useParams();
 
-  const { channelType } = data;
+  const { channel, server } = data;
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: channelType || ChannelType.TEXT,
+      type: channel?.type || ChannelType.TEXT,
     },
     mode: "all",
   });
 
   useEffect(() => {
-    if (channelType) {
-      form.setValue("type", channelType);
+    if (channel) {
+      form.setValue("name", channel.name);
+      form.setValue("type", channel.type);
     }
-  }, [channelType, isModalOpen]);
+  }, [channel, isModalOpen,]);
 
   const { isSubmitting: isLoading } = form.formState;
 
-  const createServer = mutate<formType, Channel>(
-    `/channels?serverId=${serverId}`,
-    "POST",
-    ["channels "]
+  const updateServer = mutate<formType, Channel>(
+    `/channels/${channel?.id}?serverId=${server?.id}`,
+    "PATCH",
+    ["channels", channel?.id, server?.id],
+    {
+      enabled: typeof server !== "undefined" && typeof channel != "undefined",
+    }
   );
 
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
-      createServer.mutate(values, {
+      updateServer.mutate(values, {
         onSuccess: (data) => {
           toast.success("Channel created");
-          form.reset();
           router.refresh();
+          handleClose()
         },
+        onError:(error) =>{
+          toast.error('something went wrong...')
+        }
       });
     } catch (error) {
       console.error(error);
@@ -105,7 +111,7 @@ const CreateChannelModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Create channel
+            Edit channel
           </DialogTitle>
         </DialogHeader>
 
@@ -123,8 +129,7 @@ const CreateChannelModal = () => {
 
                     <FormControl>
                       <Input
-                        // {...register('name')}
-                        disabled={isLoading || createServer.isLoading}
+                        disabled={isLoading || updateServer.isLoading}
                         className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
                         placeholder="Enter channel name"
                         {...field}
@@ -172,14 +177,14 @@ const CreateChannelModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4 ">
               <Button
-                disabled={isLoading || createServer.isLoading}
+                disabled={isLoading || updateServer.isLoading}
                 variant={"primary"}
               >
                 {(() => {
-                  if (isLoading || createServer.isLoading)
+                  if (isLoading || updateServer.isLoading)
                     return <LoadingSpinner size={20} />;
 
-                  return "Create";
+                  return "Save";
                 })()}
               </Button>
             </DialogFooter>
@@ -190,4 +195,4 @@ const CreateChannelModal = () => {
   );
 };
 
-export default CreateChannelModal;
+export default EditChannelModal;
