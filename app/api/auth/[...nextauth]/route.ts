@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
     // },
     async jwt({user, token,}) {
       const spread = {...token, ...user}
-      console.log(`🚀 jwt callback 🚀 ${spread}`)
+      // console.log(`🚀 jwt callback 🚀 ${spread}`)
       if(user) return spread
 
       return token;
@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
     },
   //   // will run every time getServerSession and use session use
     async session({token, session}) {
-      console.log('🚀 session callback 🚀', session)
+      // console.log('🚀 session callback 🚀', session)
       // session.user = token.user
       // session.authTokens = token.authTokens;
       return session;

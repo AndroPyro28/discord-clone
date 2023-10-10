@@ -5,9 +5,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  theme = "dark"
+
+generator dbml {
+  provider = "prisma-dbml-generator"
 }
 
 datasource db {
@@ -22,9 +22,9 @@ model Server {
   inviteCode String @unique
 
   // this is Profile in tutorial but we change it to user model
-  userId  String
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  members Member[]
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members  Member[]
   channels Channel[]
 }
 
@@ -42,10 +42,14 @@ model Member {
   updatedAt DateTime @updatedAt
 
   //relation
-  userId   String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  serverId String
-  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  userId                 String
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serverId               String
+  server                 Server         @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  conversationsInitiated Conversation[] @relation("memberOne")
+  conversationsReceived  Conversation[] @relation("memberTwo")
+  messages               Message[]
+  directMessages DirectMessage[]
 }
 
 enum ChannelType {
@@ -64,7 +68,47 @@ model Channel {
   server    Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
 }
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  fileUrl   String?  @db.Text
+  deleted   Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberId  String
+  member    Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  channelId String
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id            String          @id @default(uuid())
+  memberOneId   String
+  memberOne     Member          @relation("memberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
+  memberTwoId   String
+  memberTwo     Member          @relation("memberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
+  directMessages DirectMessage[]
+
+  @@unique([memberOneId, memberTwoId])
+}
+
+model DirectMessage {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  fileUrl   String?  @db.Text
+  deleted   Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberId       String
+  member         Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  }
 
 // necessary for next auth
 

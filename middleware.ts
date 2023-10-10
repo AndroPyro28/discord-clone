@@ -1,9 +1,7 @@
 import middleware, {withAuth} from "next-auth/middleware"
-import { NextResponse } from "next/server"
-import getCurrentUser from "./actions/getCurrentUser"
 
 export default withAuth(async function middleware(req) {
-
+    console.log('middleware runnnn')
     // const currentUser = await getCurrentUser();
 
     // const {pathname} = req.nextUrl
@@ -15,7 +13,6 @@ export default withAuth(async function middleware(req) {
 },{
     pages: {
         signIn: '/login',
-        
     },
     callbacks: {
        async authorized({token, req}) {

@@ -62,6 +62,7 @@
     "eslint-config-next": "latest",
     "postcss": "latest",
     "prisma": "^5.3.1",
+    "prisma-dbml-generator": "^0.10.0",
     "prisma-erd-generator": "^1.11.1",
     "tailwindcss": "latest",
     "typescript": "latest"
