@@ -13,7 +13,6 @@ import { mutate } from "@/hooks/useQueryProcessor";
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
 
 function AuthForm() {
-  
   type variant = "LOGIN" | "REGISTER";
   const [variants, setVariants] = useState<variant>("LOGIN");
   const [loading, setLoading] = useState(false);
@@ -21,22 +20,26 @@ function AuthForm() {
   const session = useSession();
 
   const schema = z.object({
-    name: variants === 'REGISTER' ? z.string().nonempty('Name is required') : z.string(),
+    name:
+      variants === "REGISTER"
+        ? z.string().nonempty("Name is required")
+        : z.string(),
     email: z.string().email("Invalid email").nonempty("Email is required"),
-    password: variants === 'REGISTER' ? z
-      .string()
-      .nonempty("Password is required")
-      .refine(
-        (value) =>
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/.test(
-            value
-          ),
-        "Must contain 8 Characters, one uppercase, lowercase, one number and one special case character"
-      ) : z
-      .string()
-      .nonempty("Password is required")
+    password:
+      variants === "REGISTER"
+        ? z
+            .string()
+            .nonempty("Password is required")
+            .refine(
+              (value) =>
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/.test(
+                  value
+                ),
+              "Must contain 8 Characters, one uppercase, lowercase, one number and one special case character"
+            )
+        : z.string().nonempty("Password is required"),
   });
-  
+
   type FormValues = z.infer<typeof schema> | FieldValues;
 
   useEffect(() => {
@@ -63,39 +66,38 @@ function AuthForm() {
       email: "",
       password: "",
     },
-    mode: 'all',
+    mode: "all",
     resolver: zodResolver(schema),
   });
 
-  const registerMutation = mutate<FormValues, unknown>('/register', 'POST', ['register'])
-
+  const registerMutation = mutate<FormValues, unknown>("/register", "POST", [
+    "register",
+  ]);
 
   const disabled = loading || isSubmitting;
 
-  
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
     try {
       if (variants == "REGISTER") {
-        
-            registerMutation.mutate(data, {
-              onSuccess: async () => {
-                toast.success("Register Success!");
-                void signIn("credentials",data);
-              }
-            })
+        registerMutation.mutate(data, {
+          onSuccess: async () => {
+            toast.success("Register Success!");
+            void signIn("credentials", data);
+          },
+        });
       }
       if (variants == "LOGIN") {
-          const response = await signIn("credentials", {
-            ...data,
-            redirect: false,
-          });
-          if (response?.error) {
-            toast.error("invalid credentials");
-          }
-          if (response?.ok && !response.error) {
-            toast.success("Logged In!");
-          }
+        const response = await signIn("credentials", {
+          ...data,
+          redirect: false,
+        });
+        if (response?.error) {
+          toast.error("invalid credentials");
+        }
+        if (response?.ok && !response.error) {
+          toast.success("Logged In!");
+        }
       }
     } catch (error: any) {
       // toast.error(error.response.data);
@@ -127,7 +129,9 @@ function AuthForm() {
   return (
     <div className="flex flex-col sm:w-[90%] md:w-[60%] rounded-md  text-white items-center gap-5">
       <h1 className="text-4xl font-bold">Welcome back!</h1>
-      <p className="text-gray-400 text-xl">We're so excited to see you again!</p>
+      <p className="text-gray-400 text-xl">
+        We're so excited to see you again!
+      </p>
 
       <form
         action=""
@@ -136,7 +140,7 @@ function AuthForm() {
       >
         {variants === "REGISTER" && (
           <Input
-          className="bg-[rgb(30,31,34)] text-white w-full p-3 outline-none rounded-md"
+            className="bg-[rgb(30,31,34)] text-white w-full p-3 outline-none rounded-md"
             errors={errors}
             label="Name"
             register={register}
@@ -176,52 +180,48 @@ function AuthForm() {
           {(() => {
             if (!loading) return variants === "LOGIN" ? "Sign in" : "Register";
 
-              return <LoadingSpinner size={30} />;
-
+            return <LoadingSpinner size={30} />;
           })()}
         </button>
-
-        
       </form>
 
       <div className="mt-6 w-full">
-          <div className="relative">
-            <div className="absolue inset-0 flex items-center ">
-              <div className="w-full border-white border-t" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-black px-2 text-white -mt-3">
-                Or continue with
-              </span>
-            </div>
+        <div className="relative">
+          <div className="absolue inset-0 flex items-center ">
+            <div className="w-full border-white border-t" />
           </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-black px-2 text-white -mt-3">
+              Or continue with
+            </span>
+          </div>
+        </div>
 
         <div className="mt-6 flex gap-2">
-            <AuthSocialButton
-              icon={BsGithub}
-              onClick={() => socialActions("github")}
-              socialName="github"
-            />
-            <AuthSocialButton
-              icon={BsGoogle}
-              onClick={() => socialActions("google")}
-              socialName="google"
+          <AuthSocialButton
+            icon={BsGithub}
+            onClick={() => socialActions("github")}
+            socialName="github"
+          />
+          <AuthSocialButton
+            icon={BsGoogle}
+            onClick={() => socialActions("google")}
+            socialName="google"
+          />
+        </div>
 
-            />
-          </div>
-
-        <div
-          className="flex gap-2 text-md mt-6 px-2 text-gray-500"
-          
-        >
+        <div className="flex gap-2 text-md mt-6 px-2 text-gray-500">
           {variants === "LOGIN"
             ? "New to discord?"
             : "Already have an account?"}
-          <div className=" cursor-pointer text-[rgb(4,165,228)]" onClick={toggleVariant}>
+          <div
+            className=" cursor-pointer text-[rgb(4,165,228)]"
+            onClick={toggleVariant}
+          >
             {variants === "LOGIN" ? "Create an account" : "Login"}
           </div>
         </div>
-    </div>
+      </div>
     </div>
   );
 }

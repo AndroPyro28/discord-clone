@@ -6,6 +6,7 @@ import ModalProvider from "@/components/providers/ModalProvider";
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import "@uploadthing/react/styles.css";
+import { SocketIoProvider } from "@/components/providers/SocketIoProvider";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -21,12 +22,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(font.className,'bg-white dark:bg-[#313338]')}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="discord-theme">
-          <Providers>
-            <ModalProvider />
-            {children}
-          </Providers>
+      <body className={cn(font.className, "bg-white dark:bg-[#313338]")}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          storageKey="discord-theme"
+        >
+          <SocketIoProvider>
+            <Providers>
+              <ModalProvider />
+              {children}
+            </Providers>
+          </SocketIoProvider>
         </ThemeProvider>
       </body>
     </html>
