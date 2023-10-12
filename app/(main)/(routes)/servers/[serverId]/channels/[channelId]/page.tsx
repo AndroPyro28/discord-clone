@@ -40,7 +40,7 @@ const page: React.FC<ChannelIdPageProps> = async ({
         serverId={channel.serverId}
         type="channel"
       />
-      <div className="flex-1">Future messages</div>
+      <ChatMessages />
       <ChatInput
         name={channel.name}
         apiUrl="/api/socket/messages"

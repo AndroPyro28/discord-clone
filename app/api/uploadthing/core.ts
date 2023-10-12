@@ -25,13 +25,7 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.id);
       console.log("file url", file.url);
     }),
-    messageFile: f(['image', 'pdf'])
-    .middleware( async ({req}) => await auth(req))
-    .onUploadComplete(async ({ metadata, file }) => {
-        console.log("Upload complete for userId:", metadata.id);
-        console.log("file url", file.url);
-    }),
-    deleteImage: f(['image', 'pdf'])
+    messageFile: f({ image: { maxFileSize: "128MB", maxFileCount: 1 }, video: { maxFileSize: "128MB", maxFileCount: 1 }, pdf: { maxFileSize: "128MB", maxFileCount: 1 }})
     .middleware( async ({req}) => await auth(req))
     .onUploadComplete(async ({ metadata, file }) => {
         console.log("Upload complete for userId:", metadata.id);

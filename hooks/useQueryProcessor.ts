@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { experimental_useFormStatus } from "react-dom";
 const controller = new AbortController();
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: "http://localhost:3000/api",
   headers: { "Content-type": "application/json" },
 });

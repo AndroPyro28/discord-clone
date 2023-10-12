@@ -6,7 +6,11 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem } from "../ui/form";
 import { Input } from "../ui/input";
 import { Plus, Smile } from "lucide-react";
-
+import qs from 'query-string'
+import axios from "axios";
+import { useModal } from "@/hooks/use-modal-store";
+import EmojiPicker from "../EmojiPicker";
+import { useRouter } from "next/navigation";
 type ChatInputProps = {
   apiUrl: string;
   query: Record<string, any>;
@@ -21,6 +25,10 @@ const formSchema = z.object({
 type formType = z.infer<typeof formSchema>;
 
 const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
+
+  const {onOpen} = useModal();
+  
+  const router = useRouter()
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,11 +42,23 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
   const { handleSubmit } = form;
 
   const onSubmit: SubmitHandler<formType> = async (values) => {
-    console.log(values)
+    try {
+      const url = qs.stringifyUrl({
+        url: `${origin}${apiUrl}`,
+        query
+      });
+      const res = await axios.post(url, values); 
+      form.reset();
+      router.refresh()
+    } catch (error) {
+      console.error(error)
+    }
   };
+
+
   return (
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
+    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <FormField
         control={form.control}
         name="content"
@@ -47,6 +67,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
             <FormControl>
               <div className="relative p-4 pb-6">
                 <button
+                onClick={() => onOpen('messageFile', {apiUrl, query})}
                   type="button"
                   className="absolute top-7 left-8 h-[24px] w-[24px] bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
                 >
@@ -59,7 +80,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
                   {...field}
                 />
                 <div className="absolute top-7 right-8">
-                    <Smile />
+                    <EmojiPicker onChange={(emoji) => { field.onChange(`${field.value}${emoji.native}`)}} />
                 </div>
               </div>
             </FormControl>
