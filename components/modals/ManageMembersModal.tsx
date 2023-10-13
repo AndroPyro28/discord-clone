@@ -59,7 +59,7 @@ const ManageMembersModal = () => {
     try {
       setLoadingId(memberId);
       const url = qs.stringifyUrl({
-        url: `${origin}/api/members/${memberId}`,
+        url: `/api/members/${memberId}`,
         query: {
           serverId: server?.id,
         },

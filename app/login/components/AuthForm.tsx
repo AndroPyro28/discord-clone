@@ -130,7 +130,7 @@ function AuthForm() {
     <div className="flex flex-col sm:w-[90%] md:w-[60%] rounded-md  text-white items-center gap-5">
       <h1 className="text-4xl font-bold">Welcome back!</h1>
       <p className="text-gray-400 text-xl">
-        We're so excited to see you again!
+        We&apos;re so excited to see you again!
       </p>
 
       <form

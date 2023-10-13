@@ -1,8 +1,9 @@
 import getCurrentUser from "@/actions/getCurrentUser";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatInput from "@/components/chat/ChatInput";
+import ChatMessages from "@/components/chat/ChatMessages";
 import prismaDB from "@/lib/db";
-import { redirect, useParams } from "next/navigation";
+import { redirect } from "next/navigation";
 import React from "react";
 
 type ChannelIdPageProps = {
@@ -40,7 +41,20 @@ const page: React.FC<ChannelIdPageProps> = async ({
         serverId={channel.serverId}
         type="channel"
       />
-      <ChatMessages />
+      <ChatMessages
+        member={member}
+        name={channel.name}
+        type="channel"
+        apiUrl="/api/messages"
+        socketUrl="/api/socket/messages"
+        socketQuery={{
+          channelId: channel.id,
+          serverId: channel.serverId,
+        }}
+        paramKey="channelId"
+        paramValue={channel.id}
+        chatId={channel.id}
+      />
       <ChatInput
         name={channel.name}
         apiUrl="/api/socket/messages"

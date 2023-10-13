@@ -67,6 +67,7 @@ const CreateServerModal = () => {
           toast.success('Server created.')
           form.reset();
           router.refresh();
+          onClose();
         },
       });
     } catch (error) {
@@ -76,29 +77,19 @@ const CreateServerModal = () => {
 
   // if there's a file that has been uploaded but didn't send we will delete it
 
-  const fileUrl = form.getValues('imageUrl')
-
   const deleteFile = mutate<string, null>(
     `/upload-thing-delete/`,
     "POST",
-    ["delete", "uploadthing"],
-    {
-      enabled: fileUrl != "",
-    }
+    ["delete", "uploadthing"]
   );
-  
+
   const handleClose = () => {
+    const fileUrl = form.getValues("imageUrl");
     if (fileUrl) {
-      deleteFile.mutate(fileUrl.replaceAll("https://utfs.io/f/", ""), {
-        onSettled: () => {
-          router.refresh();
-        },
-      });
+      deleteFile.mutate(fileUrl.replaceAll("https://utfs.io/f/", ""));
     }
-    form.reset();
     onClose();
   };
-
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>

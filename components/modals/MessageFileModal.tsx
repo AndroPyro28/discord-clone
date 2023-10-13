@@ -58,45 +58,37 @@ const MessageFileModal = () => {
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
       const url = qs.stringifyUrl({
-        url: `${origin}${apiUrl}`,
-        query
+        url: `${apiUrl}`,
+        query,
       });
 
-     const res = await axios.post(url, {
+      const res = await axios.post(url, {
         ...values,
-        content: values.fileUrl
-      })
-      router.refresh()
-      handleClose()
-      toast.success('File has been sent!')
+        content: values.fileUrl,
+      });
+      router.refresh();
+      form.reset();
+      onClose();
+      toast.success("File has been sent!");
     } catch (error) {
       console.error(error);
     }
   };
 
   // if there's a file that has been uploaded but didn't send we will delete it
-  const fileUrl = form.getValues('fileUrl')
   const deleteFile = mutate<string, null>(
     `/upload-thing-delete/`,
     "POST",
-    ["delete", "uploadthing"],
-    {
-      enabled: fileUrl != "",
-    }
+    ["delete", "uploadthing"]
   );
-  
+
   const handleClose = () => {
+    const fileUrl = form.getValues("fileUrl");
     if (fileUrl) {
-      deleteFile.mutate(fileUrl.replaceAll("https://utfs.io/f/", ""), {
-        onSettled: () => {
-          router.refresh();
-        },
-      });
+      deleteFile.mutate(fileUrl.replaceAll("https://utfs.io/f/", ""));
     }
-    form.reset();
     onClose();
   };
-
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>

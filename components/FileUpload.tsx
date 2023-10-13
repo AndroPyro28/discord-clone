@@ -42,7 +42,6 @@ console.log(fileType)
       });
     }
   };
-  
   if (value && fileTypeImg.includes(fileType as string)) {
     // if image type then we will display image
     return (
