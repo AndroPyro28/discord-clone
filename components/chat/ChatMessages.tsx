@@ -1,11 +1,13 @@
 "use client";
 import { Member, Message, User } from "@prisma/client";
-import React from "react";
+import React, { useEffect } from "react";
 import ChatWelcome from "./ChatWelcome";
 import useChatQuery from "@/hooks/useChatQuery";
 import { Loader2, ServerCrash } from "lucide-react";
 import ChatItem from "./ChatItem";
 import {format} from 'date-fns'
+import { useChatSocket } from "@/hooks/useChatSocket";
+import { useRouter } from "next/navigation";
 
 const DATE_FORMAT = `d MMM yyyy, HH:mm`
 
@@ -39,8 +41,19 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   paramValue,
 }) => {
   const queryKey = `chat:${chatId}`;
-  const { fetchNextPage, hasNextPage, data, isFetchingNextPage, status } =
+  const addKey = `chat:${chatId}:messages`
+  const updateKey = `chat:${chatId}:messages:update`
+  const router = useRouter();
+
+  const { fetchNextPage, hasNextPage, data, isFetchingNextPage, status, refetch } =
     useChatQuery({ queryKey, paramKey, paramValue, apiUrl });
+
+    useChatSocket({queryKey, addKey, updateKey})
+
+    // useEffect(() => {
+    //   refetch()
+    // }, [refetch, queryKey])
+
   if (status === "loading") {
     return (
       <div className="flex flex-col flex-1 justify-center items-center">

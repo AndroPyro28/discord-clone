@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { io as ClientIO } from "socket.io-client";
@@ -22,6 +23,7 @@ export const SocketIoProvider: React.FC<React.PropsWithChildren> = ({
 }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     const socketInstance = new (ClientIO as any)(
@@ -30,9 +32,12 @@ export const SocketIoProvider: React.FC<React.PropsWithChildren> = ({
     );
 
     socketInstance.on('connect', () => {
+      console.log('connected')
         setIsConnected(true)
     })
+    
     socketInstance.on('disconnect', () => {
+      console.log('disconnected')
         setIsConnected(false)
     })
 

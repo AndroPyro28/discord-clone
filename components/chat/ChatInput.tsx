@@ -28,7 +28,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
 
   const {onOpen} = useModal();
   
-  const router = useRouter()
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,12 +43,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
   const onSubmit: SubmitHandler<formType> = async (values) => {
     try {
       const url = qs.stringifyUrl({
-        url: `${origin}${apiUrl}`,
+        url: `${apiUrl}`,
         query
       });
       const res = await axios.post(url, values); 
       form.reset();
-      router.refresh()
     } catch (error) {
       console.error(error)
     }
@@ -74,7 +72,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ apiUrl, query, name, type }) => {
                   <Plus className="text-white dark:text-[#313338]" />
                 </button>
                 <Input
-                  disabled={isLoading}
+                  // disabled={isLoading}
                   className="px-14 py-6 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
                   placeholder={`Message ${type === "conversation" ? name : "#" + name}`}
                   {...field}

@@ -66,7 +66,7 @@ const MessageFileModal = () => {
         ...values,
         content: values.fileUrl,
       });
-      router.refresh();
+      // router.refresh();
       form.reset();
       onClose();
       toast.success("File has been sent!");
