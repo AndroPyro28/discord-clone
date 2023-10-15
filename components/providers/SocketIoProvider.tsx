@@ -7,16 +7,11 @@ import { io as ClientIO } from "socket.io-client";
 type SocketContextType = {
   socket: any | null;
   isConnected: boolean;
-  setSocket: any
-  setIsConnected:any
-
 };
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
-  setSocket: null,
-  setIsConnected: null
 });
 
 export const useSocket = () => {
@@ -31,28 +26,28 @@ export const SocketIoProvider: React.FC<React.PropsWithChildren> = ({
   const router = useRouter()
 
   useEffect(() => {
-    // const socketInstance = new (ClientIO as any)(
-    //   process.env.NEXT_PUBLIC_SITE_URL!,
-    //   { path: "/api/socket/io", addTrailingSlash: false }
-    // );
+    const socketInstance = new (ClientIO as any)(
+      process.env.NEXT_PUBLIC_SITE_URL!,
+      { path: "/api/socket/io", addTrailingSlash: false }
+    );
 
-    // socketInstance.on('connect', () => {
-    //   console.log('connected')
-    //     setIsConnected(true)
-    // })
+    socketInstance.on('connect', () => {
+      console.log('connected')
+        setIsConnected(true)
+    })
     
-    // socketInstance.on('disconnect', () => {
-    //   console.log('disconnected')
-    //     setIsConnected(false)
-    // })
+    socketInstance.on('disconnect', () => {
+      console.log('disconnected')
+        setIsConnected(false)
+    })
 
-    // setSocket(socketInstance)
+    setSocket(socketInstance)
 
-    // return () => {
-    //     socketInstance.disconnect()
-    // }
+    return () => {
+        socketInstance.disconnect()
+    }
 
   }, []);
 
-  return <SocketContext.Provider value={{socket, isConnected, setSocket, setIsConnected}}>{children}</SocketContext.Provider>;
+  return <SocketContext.Provider value={{socket, isConnected}}>{children}</SocketContext.Provider>;
 };
