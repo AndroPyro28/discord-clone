@@ -1,6 +1,8 @@
 import getOrCreateConversation from "@/actions/conversation";
 import getCurrentUser from "@/actions/getCurrentUser";
 import ChatHeader from "@/components/chat/ChatHeader";
+import ChatInput from "@/components/chat/ChatInput";
+import ChatMessages from "@/components/chat/ChatMessages";
 import prismaDB from "@/lib/db";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -41,6 +43,12 @@ const MemberIdPage: React.FC<MemberIdPageProps> = async ({
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full ">
       <ChatHeader serverId={serverId} imageUrl={otherMember.user.image!} name={otherMember.user.name!} type={'conversation'} key={otherMember.id}/>
+      <ChatMessages member={currentMember} name={otherMember.user.name as string} chatId={conversation.id} type="conversation" apiUrl="/api/direct-messages" paramKey="conversationId" paramValue={conversation.id} socketUrl="/api/socket/direct-messages" socketQuery={{
+        conversationId: conversation.id
+      }} />
+      <ChatInput name={otherMember.user.name as string} type="conversation" apiUrl="/api/socket/direct-messages" query={{
+        conversationId: conversation.id
+      }} />
     </div>
   );
 };

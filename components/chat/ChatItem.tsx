@@ -24,6 +24,7 @@ type ChatItemProps = {
   member: Member & {
     user: User;
   };
+  type: "conversation" | "channel";
   timestamp: string;
   fileUrl: string | null;
   deleted: boolean;
@@ -54,19 +55,20 @@ const ChatItem: React.FC<ChatItemProps> = ({
   currentMember,
   isUpdated,
   socketUrl,
+  type,
   socketQuery,
 }) => {
   const [isEditting, setIsEditting] = useState(false);
-  const {onOpen} = useModal();
-  const params = useParams()
-  const router = useRouter()
+  const { onOpen } = useModal();
+  const params = useParams();
+  const router = useRouter();
 
   const onMemberClick = () => {
-    if(member.id === currentMember.id) {
+    if (member.id === currentMember.id) {
       return;
     }
-    router.push(`/servers/${params?.serverId}/conversations/${member.id}`)
-  }
+    router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
+  };
 
   const form = useForm<formSchemaType>({
     defaultValues: {
@@ -83,34 +85,34 @@ const ChatItem: React.FC<ChatItemProps> = ({
   }, [content, form]);
 
   useEffect(() => {
-    const handleKeyDown = (event:KeyboardEvent) => {
-      if(event.key === "Escape" || event.keyCode === 27) {
-        setIsEditting(false)
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.keyCode === 27) {
+        setIsEditting(false);
       }
-    }
-    window.addEventListener('keydown', handleKeyDown);
+    };
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit: SubmitHandler<formSchemaType> = async (values) => {
-      try {
-        const url = qs.stringifyUrl({
-          url:`${socketUrl}/${id}`,
-          query:socketQuery
-        })
+    try {
+      const url = qs.stringifyUrl({
+        url: `${socketUrl}/${id}`,
+        query: socketQuery,
+      });
 
-       const res = await axios.patch(url, values)
-       form.reset()
-       setIsEditting(false);
-      } catch (error) {
-        console.error(error)
-      } finally {
-       setIsEditting(false);
-      }
+      const res = await axios.patch(url, values);
+      form.reset();
+      setIsEditting(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsEditting(false);
+    }
   };
 
   const isAdmin = currentMember.role === MemberRole.ADMIN;
@@ -122,7 +124,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
   const fileType = fileUrl?.split(".").pop();
 
   const fileTypeImg = ["jpg", "png", "webp"];
-  const fileTypeVideo = ["mp4", "webm", "avi", "mkr"];
+  const fileTypeVideo = ["mp4", "webm", "avi", "mkr", 'mkv'];
   const fileTypePdf = "pdf";
 
   const isPdf = fileType === fileTypePdf && fileUrl;
@@ -132,23 +134,29 @@ const ChatItem: React.FC<ChatItemProps> = ({
   return (
     <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
       <div className="group flex gap-x-2 items-start w-full">
-        <div className="cursor-pointer hover:drop-shadow-md transition" onClick={onMemberClick}>
+        <div
+          className="cursor-pointer hover:drop-shadow-md transition"
+          onClick={onMemberClick}
+        >
           <UserAvatar src={member.user.image as string} />
         </div>
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-x-2 ">
             <div className="flex items-center ">
-              <p className="font-semibold text-sm hover:underline cursor-pointer mr-2" onClick={onMemberClick}>
+              <p
+                className="font-semibold text-sm hover:underline cursor-pointer mr-2"
+                onClick={onMemberClick}
+              >
                 {member.user.name}
               </p>
-              {
-                currentMember.userId == member.user.id && (
-                  <p className="text-xs  text-zinc-500 dark:text-zinc-400 mr-1">(You)</p>
-                )
-              }
-              
+              {currentMember.userId == member.user.id && (
+                <p className="text-xs  text-zinc-500 dark:text-zinc-400 mr-1">
+                  (You)
+                </p>
+              )}
+
               <ActionTooltip label={member.role}>
-               {roleIconMap[member.role]}
+                {roleIconMap[member.role]}
               </ActionTooltip>
             </div>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -238,7 +246,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
                       <FormControl>
                         <div className="relative w-full">
                           <Input
-                          disabled={isLoading}
+                            disabled={isLoading}
                             className="p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
                             placeholder="Edited message"
                             {...field}
@@ -248,32 +256,51 @@ const ChatItem: React.FC<ChatItemProps> = ({
                     </FormItem>
                   )}
                 />
-                <Button disabled={isLoading} variant={'primary'} size={'sm'} > Save </Button>
+                <Button disabled={isLoading} variant={"primary"} size={"sm"}>
+                  {" "}
+                  Save{" "}
+                </Button>
               </form>
-              <span className="text-[13px] mt-1 text-zinc-400">Press escape to cancel, enter to save.</span>
+              <span className="text-[13px] mt-1 text-zinc-400">
+                Press escape to cancel, enter to save.
+              </span>
             </Form>
           )}
         </div>
       </div>
 
-      {canDeleteMessage && (
-        <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm">
-          {canEditMessage && (
-            <ActionTooltip label="Edit">
-              <Edit
-                onClick={() => setIsEditting(true)}
-                className=" cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
-              />
-            </ActionTooltip>
-          )}
+      {(() => {
+        if (canDeleteMessage) {
+          return (
+            <div className="hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm">
+              {canEditMessage && (
+                <ActionTooltip label="Edit">
+                  <Edit
+                    onClick={() => setIsEditting(true)}
+                    className=" cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
+                  />
+                </ActionTooltip>
+              )}
 
-          {canDeleteMessage && (
-            <ActionTooltip label="Delete">
-              <Trash onClick={() => onOpen('deleteMessage', {apiUrl:`${socketUrl}/${id}`,query: socketQuery })} className=" cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition" />
-            </ActionTooltip>
-          )}
-        </div>
-      )}
+              {((type === "channel" && canDeleteMessage) ||
+                (type === "conversation" && isOwner)) && ( // can delete only if channel not conversation
+                <ActionTooltip label="Delete">
+                  <Trash
+                    onClick={() =>
+                      onOpen("deleteMessage", {
+                        apiUrl: `${socketUrl}/${id}`,
+                        query: socketQuery,
+                      })
+                    }
+                    className=" cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
+                  />
+                </ActionTooltip>
+              )}
+            </div>
+          );
+        }
+        return null;
+      })()}
     </div>
   );
 };

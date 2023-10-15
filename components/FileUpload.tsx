@@ -30,7 +30,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const fileType = value.split(".").pop();
   const fileTypeImg = ["jpg", "png", "webp"];
-  const fileTypeVideo = ["mp4", "webm", "avi", "mkr"];
+  const fileTypeVideo = ["mp4", "webm", "avi", "mkr", 'mkv'];
 console.log(fileType)
   const handleDelete = () => {
     onChange("");
