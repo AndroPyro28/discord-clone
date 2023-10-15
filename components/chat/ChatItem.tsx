@@ -143,7 +143,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
               </p>
               {
                 currentMember.userId == member.user.id && (
-                  <p className="text-xs  text-zinc-500 dark:text-zinc-400">(You)</p>
+                  <p className="text-xs  text-zinc-500 dark:text-zinc-400 mr-1">(You)</p>
                 )
               }
               
