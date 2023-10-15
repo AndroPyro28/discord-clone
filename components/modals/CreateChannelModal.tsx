@@ -55,6 +55,8 @@ const CreateChannelModal = () => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "createChannel";
   const router = useRouter();
+  // @ts-ignore
+  // @ts-nocheck
   const { serverId } = useParams();
 
   const { channelType } = data;
