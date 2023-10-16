@@ -59,23 +59,23 @@ export const authOptions: NextAuthOptions = {
     //   console.log('redirect', baseUrl, url)
     //   return url
     // },
-    async jwt({user, token,}) {
-      const spread = {...token, ...user}
+    async jwt({user, token, account}) {
+      // JWT INTERFACE
       // console.log(`🚀 jwt callback 🚀 ${spread}`)
-      if(user) return spread
+      if(user || token) {
+        const spread = {...token, ...user}
+        return spread
+      }
 
       return token;
 
-      // if(new Date().getTime() < token.authTokens.expiresIn) return token; // this condition means the access token is not expired yet then we return token
-
-      // return await refreshToken(token) // else we will refresh our token every time our tokens is expired
       
     },
   //   // will run every time getServerSession and use session use
-    async session({token, session}) {
-      // console.log('🚀 session callback 🚀', session)
-      // session.user = token.user
-      // session.authTokens = token.authTokens;
+    async session({token, session,user }) {
+      session.user.accessToken = token.access_token as string;
+      session.user.id = token.id as string;
+      
       return session;
     },
   },

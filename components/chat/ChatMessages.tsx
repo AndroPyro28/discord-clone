@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { io as ClientIO } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useChatScroll } from "@/hooks/useChatScroll";
+import MediaRoom from "../MediaRoom";
 
 const DATE_FORMAT = `d MMM yyyy, HH:mm`;
 

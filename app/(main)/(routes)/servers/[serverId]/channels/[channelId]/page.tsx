@@ -1,8 +1,10 @@
 import getCurrentUser from "@/actions/getCurrentUser";
+import MediaRoom from "@/components/MediaRoom";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatInput from "@/components/chat/ChatInput";
 import ChatMessages from "@/components/chat/ChatMessages";
 import prismaDB from "@/lib/db";
+import { ChannelType } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -41,29 +43,54 @@ const page: React.FC<ChannelIdPageProps> = async ({
         serverId={channel.serverId}
         type="channel"
       />
-      <ChatMessages
-        member={member}
-        name={channel.name}
-        type="channel"
-        apiUrl="/api/messages"
-        socketUrl="/api/socket/messages"
-        socketQuery={{
-          channelId: channel.id,
-          serverId: channel.serverId,
-        }}
-        paramKey="channelId"
-        paramValue={channel.id}
-        chatId={channel.id}
-      />
-      <ChatInput
-        name={channel.name}
-        apiUrl="/api/socket/messages"
-        type="channel"
-        query={{
-          channelId: channel.id,
-          serverId: serverId,
-        }}
-      />
+
+      {
+      (() => {
+        if (channel.type === ChannelType.TEXT) {
+          return (
+            <>
+              <ChatMessages
+                member={member}
+                name={channel.name}
+                type="channel"
+                apiUrl="/api/messages"
+                socketUrl="/api/socket/messages"
+                socketQuery={{
+                  channelId: channel.id,
+                  serverId: channel.serverId,
+                }}
+                paramKey="channelId"
+                paramValue={channel.id}
+                chatId={channel.id}
+              />
+              <ChatInput
+                name={channel.name}
+                apiUrl="/api/socket/messages"
+                type="channel"
+                query={{
+                  channelId: channel.id,
+                  serverId: serverId,
+                }}
+              />
+            </>
+          );
+        } else if (channel.type === ChannelType.AUDIO) {
+          return (
+            <>
+              <MediaRoom chatId={channel.id} video={false} audio={true} />
+            </>
+          );
+        } else if (channel.type === ChannelType.VIDEO) {
+          return (
+            <>
+              <MediaRoom chatId={channel.id} video={true} audio={true} />
+            </>
+          );
+        } else {
+          return null;
+        }
+      })()
+      }
     </div>
   );
 };
